@@ -82,8 +82,6 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
       view](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/viewing-and-comparing-commits/comparing-commits#comparing-tags) to
       compare the desired formbricks release tag with the one that is currently deployed. To e.g. show the diffs between v3.0.0 and v3.1.0, use
       <https://github.com/formbricks/formbricks/compare/v3.0.0...v3.1.0#files_bucket>.
-    - [File `packages/lib/env.ts`](https://github.com/formbricks/formbricks/blob/main/packages/lib/env.ts) defines all env vars by access type (`server`,
-      `client` and `runtimeEnv`).
     - [File `.env.example`](https://github.com/formbricks/formbricks/blob/main/.env.example) contains example configuration.
 
 4.  Build and deploy the image:
