@@ -107,6 +107,8 @@ pg_dump --clean \
         --file=backups/formbricks.$(date --iso-8601=seconds).dump
 ```
 
+(You need the Git-ignored `.secrets` file for the above to work.)
+
 ## License
 
 Code and configuration in this repository are licensed under [`AGPL-3.0-or-later`](https://spdx.org/licenses/AGPL-3.0-or-later.html). See
