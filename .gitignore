@@ -1,0 +1,10 @@
+# system-specific temp, backup, thumbnail etc. files
+.~lock*
+*.backup
+~$*
+.DS_Store
+Thumbs.db
+
+# sensitive data
+/.secrets
+/backups

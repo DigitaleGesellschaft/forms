@@ -1,0 +1,20 @@
+# system-specific temp, backup, thumbnail etc. files
+**/.~lock*
+**/*.backup
+**/~$*
+**/.DS_Store
+**/Thumbs.db
+
+# Git files
+/.git
+
+# sensitive data
+/.secrets
+/.env-bckp
+/backups
+
+# other files
+/init_db.sql
+/LICENSE.md
+/README.md
+/TODO.md

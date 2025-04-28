@@ -1,0 +1,85 @@
+# Fly config reference: https://fly.io/docs/reference/configuration/
+
+app = "digiges-forms"
+primary_region = "fra"
+kill_signal = "SIGINT"
+kill_timeout = "30s"
+
+[build]
+  image = "ghcr.io/formbricks/formbricks:v3.8.6"
+
+[env]
+  # Formbricks configuration, cf. https://formbricks.com/docs/self-hosting/configuration/environment-variables
+  WEBAPP_URL = "https://forms.digitale-gesellschaft.ch"
+  NEXTAUTH_URL = "https://forms.digitale-gesellschaft.ch"
+  EMAIL_AUTH_DISABLED = "0"
+  EMAIL_VERIFICATION_DISABLED = "0"
+  INVITE_DISABLED = "0"
+  IS_FORMBRICKS_CLOUD = "0"
+  PASSWORD_RESET_DISABLED = "0"
+  RATE_LIMITING_DISABLED = "0"
+  TELEMETRY_DISABLED = "1"
+  UPLOADS_DIR = "/persistent/uploads"
+  IMPRINT_ADDRESS = "Digitale Gesellschaft, 4000 Basel, Schweiz"
+  IMPRINT_URL = "https://www.digitale-gesellschaft.ch/uber-uns/kontakt/"
+  PRIVACY_URL = "https://www.digitale-gesellschaft.ch/uber-uns/rechtliches/"
+  # TERMS_URL = "https://www.example.com/terms"
+  MAIL_FROM = "forms@digig.es"
+  MAIL_FROM_NAME = "Digitale Gesellschaft Forms"
+  SMTP_AUTHENTICATED = "1"
+  SMTP_HOST = "smtp.mailbox.org"
+  SMTP_PORT = "465"
+  SMTP_REJECT_UNAUTHORIZED_TLS = "1"
+  SMTP_SECURE_ENABLED = "1"
+
+[[mounts]]
+  source = "digiges_forms"
+  destination = "/persistent"
+  initial_size = "1GB"
+  auto_extend_size_increment = "1GB"
+  auto_extend_size_threshold = 90
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 3000
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [services.concurrency]
+    type = "requests"
+    # NOTE: currently ignored since we don't scale (`flyctl scale count 1); scaling horizontally requires
+    #       [cluster support](https://formbricks.com/docs/self-hosting/setup/cluster-setup), i.e. sharing state via Redis, which is an EE feature not part of
+    #       the open-source version
+    hard_limit = 1000
+    soft_limit = 800
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+    [services.ports.http_options]
+      [services.ports.http_options.response]
+        [services.ports.http_options.response.headers]
+          # doc: https://fly.io/docs/reference/configuration/#services-ports-http_options-response-headers
+          # NOTE: setting below CSPs causes connection reset on Fly... but we'd need to enable `unsafe-*` policies anyways, so fuck it for now
+          # Content-Security-Policy = "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+          Referrer-Policy = "strict-origin-when-cross-origin"
+          Strict-Transport-Security = "max-age=63072000; includeSubDomains"
+          X-Content-Type-Options = "nosniff"
+          X-Frame-Options = "DENY"
+
+  [[services.tcp_checks]]
+    grace_period = "30s"
+    interval = "15s"
+    timeout = "5s"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  # switch to 1024 before running bigger surveys!
+  memory_mb = 512
