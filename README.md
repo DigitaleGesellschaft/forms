@@ -31,10 +31,13 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
   `512 MB` RAM](https://fly.io/docs/about/pricing/#compute)[^5] and is hosted in the *Frankfurt, Germany* (`fra`)
   [region](https://fly.io/docs/reference/regions/).
 - The `digiges-forms` app connects to the PostgreSQL database `formbricks` on our [Neon.tech](https://neon.tech/docs/introduction/about) account.
-- Should it prove necessary to expand performance for our main users (located in Switzerland), we could [increase RAM](https://fly.io/docs/flyctl/scale-memory/)
-  and/or [switch to a faster CPU](https://fly.io/docs/flyctl/scale-vm/) anytime[^6].
-- Should we also want to provide fast access for non-European users, we could [run multiple instances](https://fly.io/docs/apps/scale-count/) of Formbricks [in
-  multiple regions](https://fly.io/docs/apps/scale-count/#scale-an-app-s-regions).
+- To cope with higher demand when conducting surveys, we can [increase RAM](https://fly.io/docs/flyctl/scale-memory/) and/or [switch to a faster
+  CPU](https://fly.io/docs/flyctl/scale-vm/) as needed[^6]. It's recommended to allocate at least `1024 MB` RAM before running any serious survey.
+- Should we also want to provide fast access for non-European users, we could scale horizontally, i.e. [run multiple
+  instances](https://fly.io/docs/apps/scale-count/) of Formbricks [in multiple regions](https://fly.io/docs/launch/scale-count/#scale-an-apps-regions). This
+  would require a Formbricks' [enterprise license key](https://formbricks.com/pricing?type=selfhosted) to unlock [cluster
+  support](https://formbricks.com/docs/self-hosting/setup/cluster-setup), i.e. sharing state via Redis, which is a feature not included in the open-source
+  version.
 
 [^4]: The volume size can always be [extended](https://fly.io/docs/flyctl/volumes-extend/). To extend it to 5 GiB for example, simply run:
 
@@ -91,7 +94,7 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
     ```
 
 5.  Consult the [official migration guide](https://formbricks.com/docs/self-hosting/migration-guide). For Formbricks 4.x and above, all database migrations
-    should be done automatically without any further necessary.
+    should be done automatically without any further action necessary.
 
 ## Back up PostgreSQL DB
 
