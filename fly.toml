@@ -68,7 +68,7 @@ kill_timeout = "30s"
           # doc: https://fly.io/docs/reference/configuration/#services-ports-http_options-response-headers
           # NOTE: setting below CSP exceeds Fly proxy's metadata size limit, causing a connection reset, 
           #       cf. https://community.fly.io/t/setting-http-response-headers-on-fly-proxy-breaks-deployment/17248/2
-          #       since we'd need to set `unsafe-*` keywords anyways, the lack of a CSP is excusable
+          #       since Formbricks sets a CSP itself and we'd need to grant `unsafe-*` anyways, we don't mind
           # Content-Security-Policy = "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
           Referrer-Policy = "strict-origin-when-cross-origin"
           Strict-Transport-Security = "max-age=63072000; includeSubDomains"
