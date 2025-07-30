@@ -100,7 +100,7 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
 
 To create a full dump of the `formbricks` PostgreSQL database, run the following:
 
-``` share
+``` sh
 pg_dump --clean \
         --if-exists \
         --format=custom \
