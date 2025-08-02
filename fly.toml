@@ -6,7 +6,7 @@ kill_signal = "SIGINT"
 kill_timeout = "30s"
 
 [build]
-  image = "ghcr.io/formbricks/formbricks:v3.16.0"
+  image = "ghcr.io/formbricks/formbricks:v3.16.1"
 
 [env]
   # Formbricks configuration, cf. https://formbricks.com/docs/self-hosting/configuration/environment-variables
