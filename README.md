@@ -36,10 +36,10 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
   have to [manually](https://aiven.io/docs/platform/concepts/tls-ssl-certificates#certificate-requirements) specify the right certificate file when connecting,
   e.g.:
 
-  ```sh
+  ``` sh
   PGSSLROOTCERT=aiven.io_ca.pem psql --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets)
   ```
-  
+
 - To cope with higher demand when conducting surveys, we can [increase RAM](https://fly.io/docs/flyctl/scale-memory/) and/or [switch to a faster
   CPU](https://fly.io/docs/flyctl/scale-vm/) as needed[^6]. It's recommended to allocate at least `1024 MB` RAM before running any serious survey.
 
@@ -90,8 +90,8 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
     Documentation of all the environment variables Formbricks supports for configuration should be found [in the
     docs](https://formbricks.com/docs/self-hosting/configuration/environment-variables). If something is missing, the following resources should help:
 
-    - [File `formbricks/turbo.json`](https://github.com/formbricks/formbricks/blame/v3.17.1/turbo.json#L71-L180) lists all supported env vars without further
-      info. Use [GitHub's compare
+    - [File `turbo.json`](https://github.com/formbricks/formbricks/blame/v3.17.1/turbo.json#L71-L180) lists all supported env vars without further info. Use
+      [GitHub's compare
       view](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/viewing-and-comparing-commits/comparing-commits#comparing-tags) to
       compare the desired formbricks release tag with the one that is currently deployed. To e.g. show the diffs between v3.0.0 and v3.1.0, use
       <https://github.com/formbricks/formbricks/compare/v3.0.0...v3.1.0#files_bucket>.
