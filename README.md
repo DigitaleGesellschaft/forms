@@ -30,9 +30,19 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
   1 GiB size[^4] attached to it named `digiges_forms` with unique ID `vol_450wzml259mdx1xr`. It currently runs on a single [`shared-cpu-1x` instance with
   `512 MB` RAM](https://fly.io/docs/about/pricing/#compute)[^5] and is hosted in the *Frankfurt, Germany* (`fra`)
   [region](https://fly.io/docs/reference/regions/).
-- The `digiges-forms` app connects to the PostgreSQL database `formbricks` on our [Neon.tech](https://neon.tech/docs/introduction/about) account.
+
+- The `digiges-forms` app connects to the `formbricks` PostgreSQL database on our `pg-digiges` [Aiven.io](https://aiven.io/docs/products/postgresql) service.
+  Note that aiven.io's Postgres cluster TLS certificates are [signed by its own private CA](https://aiven.io/docs/platform/concepts/tls-ssl-certificates), so we
+  have to [manually](https://aiven.io/docs/platform/concepts/tls-ssl-certificates#certificate-requirements) specify the right certificate file when connecting,
+  e.g.:
+
+  ```sh
+  PGSSLROOTCERT=aiven.io_ca.pem psql --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets)
+  ```
+  
 - To cope with higher demand when conducting surveys, we can [increase RAM](https://fly.io/docs/flyctl/scale-memory/) and/or [switch to a faster
   CPU](https://fly.io/docs/flyctl/scale-vm/) as needed[^6]. It's recommended to allocate at least `1024 MB` RAM before running any serious survey.
+
 - Should we also want to provide fast access for non-European users, we could scale horizontally, i.e. [run multiple
   instances](https://fly.io/docs/apps/scale-count/) of Formbricks [in multiple regions](https://fly.io/docs/launch/scale-count/#scale-an-apps-regions). This
   would require a Formbricks' [enterprise license key](https://formbricks.com/pricing?type=selfhosted) to unlock [cluster
@@ -101,16 +111,35 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
 To create a full dump of the `formbricks` PostgreSQL database, run the following:
 
 ``` sh
-pg_dump --clean \
-        --if-exists \
-        --format=custom \
-        --compress=zstd:9 \
-        --no-password \
-        --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets) \
-        --file=backups/formbricks.$(date --iso-8601=seconds).dump
+PGSSLROOTCERT=aiven.io_ca.pem pg_dump \
+  --clean \
+  --if-exists \
+  --format=custom \
+  --compress=zstd:9 \
+  --no-password \
+  --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets) \
+  --file=backups/formbricks.$(date --iso-8601=seconds).dump
 ```
 
 (You need the Git-ignored `.secrets` file for the above to work.)
+
+## Restore PostgreSQL DB
+
+To restore a full dump of the `formbricks` PostgreSQL database, run the following:
+
+``` sh
+PGSSLROOTCERT=aiven.io_ca.pem pg_restore \
+  --clean \
+  --if-exists \
+  --single-transaction \
+  --no-owner \
+  --no-acl \
+  --no-password \
+  --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets) \
+  backups/formbricks.2025-09-08T15:01:13+02:00.dump
+```
+
+(You need the Git-ignored `.secrets` file for the above to work or change the `--dbname=` value to restore to a different DB location.)
 
 ## License
 
