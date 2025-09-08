@@ -31,7 +31,9 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
   `512 MB` RAM](https://fly.io/docs/about/pricing/#compute)[^5] and is hosted in the *Frankfurt, Germany* (`fra`)
   [region](https://fly.io/docs/reference/regions/).
 
-- The `digiges-forms` app connects to the `formbricks` PostgreSQL database on our `pg-digiges` [Aiven.io](https://aiven.io/docs/products/postgresql) service.
+- The `digiges-forms` app connects to the `formbricks` PostgreSQL database on our `pg-digiges` [Aiven.io](https://aiven.io/docs/products/postgresql) service
+  hosted on [DigitalOcean](https://www.digitalocean.com/) in the *Frankfurt, Germany* (`fra`) region.
+
   Note that aiven.io's Postgres cluster TLS certificates are [signed by its own private CA](https://aiven.io/docs/platform/concepts/tls-ssl-certificates), so we
   have to [manually](https://aiven.io/docs/platform/concepts/tls-ssl-certificates#certificate-requirements) specify the right certificate file when connecting,
   e.g.:
