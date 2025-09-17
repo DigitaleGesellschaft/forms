@@ -17,7 +17,6 @@ kill_timeout = "30s"
   INVITE_DISABLED = "0"
   IS_FORMBRICKS_CLOUD = "0"
   PASSWORD_RESET_DISABLED = "0"
-  PGSSLROOTCERT = "/aiven.io_ca.pem"
   RATE_LIMITING_DISABLED = "0"
   TELEMETRY_DISABLED = "1"
   UPLOADS_DIR = "/persistent/uploads"
@@ -32,6 +31,8 @@ kill_timeout = "30s"
   SMTP_PORT = "465"
   SMTP_REJECT_UNAUTHORIZED_TLS = "1"
   SMTP_SECURE_ENABLED = "1"
+  # PostgreSQL client configuration
+  PGSSLROOTCERT = "/aiven.io_ca.pem"
 
 [[mounts]]
   source = "digiges_forms"
