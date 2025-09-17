@@ -2,8 +2,6 @@
 
    Below commands are intended to be run once as admin/superuser role before a new Formbricks instance is started for the first time.
 */
- 
--- Switch to `admin` role (errors if not authorized)
 
 -- Create dedicated DB
 CREATE DATABASE formbricks;
@@ -12,7 +10,7 @@ CREATE DATABASE formbricks;
 CREATE ROLE "formbricks" WITH LOGIN PASSWORD 'REPLACE-ME';
 GRANT ALL PRIVILEGES ON DATABASE "formbricks" TO "formbricks";
 
--- NOTE: everything below must be run while connected to "formbricks" DB!!!
+-- NOTE: everything below must be run while connected to the "formbricks" DB!!!
 
 -- Install extensions required by Formbricks
 CREATE EXTENSION IF NOT EXISTS vector;
