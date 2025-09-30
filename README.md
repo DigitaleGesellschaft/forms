@@ -26,13 +26,11 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
 
 ## Hosting details
 
-- The Fly [app](https://fly.io/docs/reference/apps/) is named `digiges-forms` and has a [persistent storage volume](https://fly.io/docs/reference/volumes/) of
-  1 GiB size[^4] attached to it named `digiges_forms` with unique ID `vol_450wzml259mdx1xr`. It currently runs on a single [`shared-cpu-1x` instance with
-  `512 MB` RAM](https://fly.io/docs/about/pricing/#compute)[^5] and is hosted in the *Frankfurt, Germany* (`fra`)
-  [region](https://fly.io/docs/reference/regions/).
+- The Fly [app](https://fly.io/docs/reference/apps/) is named `digiges-forms`, currently runs on a single [`shared-cpu-1x` instance with `512 MB`
+  RAM](https://fly.io/docs/about/pricing/#compute)[^4] and is hosted in the *Frankfurt, Germany* (`fra`) [region](https://fly.io/docs/reference/regions/).
 
-- The `digiges-forms` app connects to the `formbricks` PostgreSQL database on our `pg-digiges` [Aiven](https://aiven.io/docs/products/postgresql) service
-  hosted on [DigitalOcean](https://www.digitalocean.com/) in the *Frankfurt, Germany* (`fra`) region.
+- The `digiges-forms` app connects to the `formbricks` PostgreSQL database on our `pg-digiges` [Aiven](https://aiven.io/docs/products/postgresql) service hosted
+  on [DigitalOcean](https://www.digitalocean.com/) in the *Frankfurt, Germany* (`fra`) region.
 
   Note that Aiven's Postgres cluster TLS certificates are [signed by its own private CA](https://aiven.io/docs/platform/concepts/tls-ssl-certificates), so we
   have to [manually](https://aiven.io/docs/platform/concepts/tls-ssl-certificates#certificate-requirements) specify the right certificate file when connecting,
@@ -41,6 +39,13 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
   ``` sh
   PGSSLROOTCERT=aiven.io_ca.pem psql --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets)
   ```
+
+- Formbricks [requires](https://formbricks.com/docs/self-hosting/setup/cluster-setup#redis-configuration) a Redis-compatible key value store, even for a
+  single-machine deployment. We use [Valkey](https://valkey.io/), managed by [Aiven](https://aiven.io/docs/products/postgresql) as service `valkey-digiges`,
+  hosted on [DigitalOcean](https://www.digitalocean.com/) in the *Frankfurt, Germany* (`fra`) region.
+
+- Formbricks also [requires](https://formbricks.com/docs/self-hosting/configuration/file-uploads) an S3-compatible[^5] object storage bucket to store static
+  user file uploads. We use a [Tigris](https://www.tigrisdata.com/) bucket named `digiges-forms` attached to our Fly app.
 
 - To cope with higher demand when conducting surveys, we can [increase RAM](https://fly.io/docs/flyctl/scale-memory/) and/or [switch to a faster
   CPU](https://fly.io/docs/flyctl/scale-vm/) as needed[^6]. It's recommended to allocate at least `1024 MB` RAM before running any serious survey.
@@ -51,16 +56,11 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
   support](https://formbricks.com/docs/self-hosting/setup/cluster-setup), i.e. sharing state via Redis, which is a feature not included in the open-source
   version.
 
-[^4]: The volume size can always be [extended](https://fly.io/docs/flyctl/volumes-extend/). To extend it to 5 GiB for example, simply run:
-
-    ``` sh
-    flyctl volumes extend vol_450wzml259mdx1xr --size=5
-    ```
-
-    Note that this will restart the app.
-
-[^5]: Especially the first start after a new deployment turned out to be memory-intensive (probably the Prisma Client performing the DB migrations): With
+[^4]: Especially the first start after a new deployment turned out to be memory-intensive (probably the Prisma Client performing the DB migrations): With
     256 MiB RAM, the app used to crash reproducibly, so we increased this to 512 MiB.
+
+[^5]: Note that we can't use [Backblaze B2](https://www.backblaze.com/cloud-storage) since its S3-compatible API doesn't implement the [POST
+    Object](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPOST.html) operation that Formbricks uses to upload files.
 
 [^6]: Note that scaling automatically restarts the app. The most relevant documentation on (auto)scaling Fly apps includes:
 
@@ -83,8 +83,7 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
 
 1.  Create a local snapshot of the database, see [below](#back-up-postgresql-db).
 
-2.  Set the desired [`ghcr.io/formbricks/formbricks` tag](https://github.com/formbricks/formbricks/pkgs/container/formbricks) in [`fly.toml`](fly.toml)'s
-    `build.image` key.
+2.  Set the desired [`ghcr.io/formbricks/formbricks` tag](https://github.com/formbricks/formbricks/pkgs/container/formbricks) in the [`Dockerfile`](Dockerfile).
 
 3.  Update the Formbricks configuration in [`fly.toml`](fly.toml)'s `[env]` section and -- for sensitive information -- in the app's [Fly
     secrets](https://fly.io/docs/reference/secrets/) if necessary.
@@ -92,17 +91,17 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
     Documentation of all the environment variables Formbricks supports for configuration should be found [in the
     docs](https://formbricks.com/docs/self-hosting/configuration/environment-variables). If something is missing, the following resources should help:
 
-    - [File `turbo.json`](https://github.com/formbricks/formbricks/blame/v3.17.1/turbo.json#L71-L180) lists all supported env vars without further info. Use
+    - [File `turbo.json`](https://github.com/formbricks/formbricks/blame/4.0.1/turbo.json#L113-L220) lists all supported env vars without further info. Use
       [GitHub's compare
       view](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/viewing-and-comparing-commits/comparing-commits#comparing-tags) to
-      compare the desired formbricks release tag with the one that is currently deployed. To e.g. show the diffs between v3.0.0 and v3.1.0, use
-      <https://github.com/formbricks/formbricks/compare/v3.0.0...v3.1.0#files_bucket>.
+      compare the desired formbricks release tag with the one that is currently deployed. To e.g. show the diffs between version 4.0.0 and 4.0.1, use
+      <https://github.com/formbricks/formbricks/compare/4.0.0...4.0.1#files_bucket>.
     - [File `.env.example`](https://github.com/formbricks/formbricks/blob/main/.env.example) contains example configuration.
 
 4.  Build and deploy the image:
 
     ``` sh
-    flyctl deploy --ha=false
+    flyctl deploy --ha=false --app digiges-forms
     ```
 
 5.  Consult the [official migration guide](https://formbricks.com/docs/self-hosting/migration-guide). For Formbricks 4.x and above, all database migrations

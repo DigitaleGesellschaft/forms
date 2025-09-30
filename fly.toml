@@ -19,7 +19,6 @@ kill_timeout = "30s"
   PASSWORD_RESET_DISABLED = "0"
   RATE_LIMITING_DISABLED = "0"
   TELEMETRY_DISABLED = "1"
-  UPLOADS_DIR = "/persistent/uploads"
   IMPRINT_ADDRESS = "Digitale Gesellschaft, 4000 Basel, Schweiz"
   IMPRINT_URL = "https://www.digitale-gesellschaft.ch/uber-uns/kontakt/"
   PRIVACY_URL = "https://www.digitale-gesellschaft.ch/uber-uns/rechtliches/"
@@ -31,15 +30,11 @@ kill_timeout = "30s"
   SMTP_PORT = "465"
   SMTP_REJECT_UNAUTHORIZED_TLS = "1"
   SMTP_SECURE_ENABLED = "1"
+  S3_BUCKET_NAME = "digiges-forms"
+  S3_ENDPOINT_URL = "https://fly.storage.tigris.dev"
+  S3_REGION = "auto"
   # PostgreSQL client configuration
   PGSSLROOTCERT = "/aiven.io_ca.pem"
-
-[[mounts]]
-  source = "digiges_forms"
-  destination = "/persistent"
-  initial_size = "1GB"
-  auto_extend_size_increment = "1GB"
-  auto_extend_size_threshold = 90
 
 [[services]]
   protocol = "tcp"
@@ -72,7 +67,6 @@ kill_timeout = "30s"
           #       cf. https://community.fly.io/t/setting-http-response-headers-on-fly-proxy-breaks-deployment/17248/2
           #       since Formbricks sets a CSP itself and we'd need to grant `unsafe-*` anyways, we don't mind
           # Content-Security-Policy = "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
-          Referrer-Policy = "strict-origin-when-cross-origin"
           Strict-Transport-Security = "max-age=63072000; includeSubDomains"
           X-Content-Type-Options = "nosniff"
           X-Frame-Options = "DENY"
