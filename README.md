@@ -134,7 +134,7 @@ PGSSLROOTCERT=aiven.io_ca.pem pg_restore \
   --no-acl \
   --no-password \
   --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets) \
-  backups/formbricks.2025-09-08T15:01:13+02:00.dump
+  backups/formbricks.2025-10-03T16:58:10+02:00.dump
 ```
 
 (You need the Git-ignored `.secrets` file for the above to work or change the `--dbname=` value to restore to a different DB location.)
