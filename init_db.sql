@@ -1,6 +1,6 @@
 /* Initialize PostgreSQL for Formbricks
 
-   Below commands are intended to be run once as admin/superuser role before a new Formbricks instance is started for the first time.
+   Below commands are intended to be run once as admin/superuser role before a new Formbricks instance is deployed for the first time.
 */
 
 -- Create dedicated DB
@@ -10,7 +10,7 @@ CREATE DATABASE formbricks;
 CREATE ROLE "formbricks" WITH LOGIN PASSWORD 'REPLACE-ME';
 GRANT ALL PRIVILEGES ON DATABASE "formbricks" TO "formbricks";
 
--- NOTE: everything below must be run while connected to the "formbricks" DB!!!
+-- NOTE: everything below must be run while connected to the "formbricks" DB (`\c formbricks`)!
 
 -- Install extensions required by Formbricks
 CREATE EXTENSION IF NOT EXISTS vector;
