@@ -50,11 +50,8 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
 - To cope with higher demand when conducting surveys, we can [increase RAM](https://fly.io/docs/flyctl/scale-memory/) and/or [switch to a faster
   CPU](https://fly.io/docs/flyctl/scale-vm/) as needed[^6]. It's recommended to allocate at least `1024 MB` RAM before running any serious survey.
 
-- Should we also want to provide fast access for non-European users, we could scale horizontally, i.e. [run multiple
-  instances](https://fly.io/docs/apps/scale-count/) of Formbricks [in multiple regions](https://fly.io/docs/launch/scale-count/#scale-an-apps-regions). This
-  would require a Formbricks' [enterprise license key](https://formbricks.com/pricing?type=selfhosted) to unlock [cluster
-  support](https://formbricks.com/docs/self-hosting/setup/cluster-setup), i.e. sharing state via Redis, which is a feature not included in the open-source
-  version.
+  We could also scale horizontally, i.e. [run multiple instances](https://fly.io/docs/apps/scale-count/) of Formbricks, even [in multiple
+  regions](https://fly.io/docs/launch/scale-count/#scale-an-apps-regions).
 
 [^4]: Especially the first start after a new deployment turned out to be memory-intensive (probably the Prisma Client performing the DB migrations): With
     256 MiB RAM, the app used to crash reproducibly, so we increased this to 512 MiB.
