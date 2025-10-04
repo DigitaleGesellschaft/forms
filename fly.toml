@@ -39,15 +39,13 @@ kill_timeout = "30s"
 [[services]]
   protocol = "tcp"
   internal_port = 3000
-  auto_stop_machines = false
+  auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 1
 
   [services.concurrency]
     type = "requests"
-    # NOTE: currently ignored since we don't scale (`flyctl scale count 1); scaling horizontally requires
-    #       [cluster support](https://formbricks.com/docs/self-hosting/setup/cluster-setup), i.e. sharing state via Redis, which is an EE feature not part of
-    #       the open-source version
+    # NOTE: currently ignored since we don't scale (`flyctl scale count 1)
     hard_limit = 1000
     soft_limit = 800
 
@@ -79,5 +77,5 @@ kill_timeout = "30s"
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  # switch to 1024 before running bigger surveys!
-  memory_mb = 512
+  # switch to 1024mb before running bigger surveys!
+  memory = "512mb"
