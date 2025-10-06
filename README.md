@@ -15,6 +15,9 @@ Sensitive configuration data is stored via [Fly secrets](https://fly.io/docs/ref
 - `DATABASE_URL`
 - `ENCRYPTION_KEY`[^2]
 - `NEXTAUTH_SECRET`[^3]
+- `REDIS_URL`
+- `S3_ACCESS_KEY`
+- `S3_SECRET_KEY`
 - `SMTP_PASSWORD`
 - `SMTP_USER`
 
