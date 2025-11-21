@@ -14,7 +14,7 @@ backup:
     --file=backups/formbricks.$(date --iso-8601=seconds).dump
 
 # Restore Formbricks' PostgreSQL DB
-restore datetime=`find backups -maxdepth 1 -name 'formbricks.*.dump' -print0 | xargs -0 -n1 basename | grep -oP 'formbricks\.\K.*(?=\.dump$)' | sort | tail -1`:
+restore datetime=`find ./backups -maxdepth 1 -name 'formbricks.*.dump' -print0 | xargs -0 -n1 basename | grep -oP 'formbricks\.\K.*(?=\.dump$)' | sort | tail -1`:
   @PGSSLROOTCERT=./aiven.io_ca.pem pg_restore \
     --clean \
     --if-exists \
