@@ -101,7 +101,7 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
 4.  Build and deploy the image:
 
     ``` sh
-    flyctl deploy --ha=false --app digiges-forms
+    just deploy
     ```
 
 5.  Consult the [official migration guide](https://formbricks.com/docs/self-hosting/migration-guide). For Formbricks 4.x and above, all database migrations
@@ -112,35 +112,26 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
 To create a full dump of the `formbricks` PostgreSQL database, run the following:
 
 ``` sh
-PGSSLROOTCERT=aiven.io_ca.pem pg_dump \
-  --clean \
-  --if-exists \
-  --format=custom \
-  --compress=zstd:9 \
-  --no-password \
-  --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets) \
-  --file=backups/formbricks.$(date --iso-8601=seconds).dump
+just backup
 ```
 
 (You need the Git-ignored `.secrets` file for the above to work.)
 
 ## Restore PostgreSQL DB
 
-To restore a full dump of the `formbricks` PostgreSQL database, run the following:
+To restore the `formbricks` PostgreSQL database from the latest local dump created via `just backup`, run the following:
 
 ``` sh
-PGSSLROOTCERT=aiven.io_ca.pem pg_restore \
-  --clean \
-  --if-exists \
-  --single-transaction \
-  --no-owner \
-  --no-acl \
-  --no-password \
-  --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets) \
-  backups/formbricks.2025-11-11T04:20:49+01:00.dump
+just restore
 ```
 
-(You need the Git-ignored `.secrets` file for the above to work or change the `--dbname=` value to restore to a different DB location.)
+Alternatively, you can restore an explicit dump via the recipe's `datetime` parameter:
+
+``` sh
+just restore '2025-11-11T04:20:49+01:00'
+```
+
+(You need the Git-ignored `.secrets` file for the above to work.)
 
 ## License
 
