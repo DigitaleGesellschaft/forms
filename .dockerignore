@@ -1,19 +1,13 @@
-# system-specific temp, backup, thumbnail etc. files
+# ignore everything...
+**
+
+# ...except these files/folders...
+!/aiven.io_ca.pem
+
+# ...but always ignore these files even beneath included folders
+## system-specific temp, backup, thumbnail etc. files
 **/.~lock*
 **/*.backup
 **/~$*
 **/.DS_Store
 **/Thumbs.db
-
-# Git files
-/.git
-
-# sensitive data
-/.secrets
-/backups
-
-# other files
-/init_db.sql
-/LICENSE.md
-/README.md
-/TODO.md
