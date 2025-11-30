@@ -1,10 +1,12 @@
+set quiet
+
 [default]
 _list_cmds:
-  @{{just_executable()}} --list
+  {{just_executable()}} --list
 
 # Back up Formbricks' PostgreSQL DB
 backup:
-  @PGSSLROOTCERT=./aiven.io_ca.pem pg_dump \
+  PGSSLROOTCERT=./aiven.io_ca.pem pg_dump \
     --clean \
     --if-exists \
     --format=custom \
@@ -15,7 +17,7 @@ backup:
 
 # Restore Formbricks' PostgreSQL DB
 restore datetime=`find ./backups -maxdepth 1 -name 'formbricks.*.dump' -print0 | xargs -0 -n1 basename | grep -oP 'formbricks\.\K.*(?=\.dump$)' | sort | tail -1`:
-  @PGSSLROOTCERT=./aiven.io_ca.pem pg_restore \
+  PGSSLROOTCERT=./aiven.io_ca.pem pg_restore \
     --clean \
     --if-exists \
     --single-transaction \
@@ -25,6 +27,35 @@ restore datetime=`find ./backups -maxdepth 1 -name 'formbricks.*.dump' -print0 |
     --dbname=$(grep -Po "(?<=^DATABASE_URL=').+(?='$)" .secrets) \
     backups/formbricks.{{datetime}}.dump
 
-# Deploy new Formbricks release
+# Update Dockerfile to latest stable Formbricks release
+update:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  LAST_TAG=$(
+    grep --perl-regexp --only-matching '^FROM\b.+?:\K\S+' Dockerfile \
+      | tail --lines=1
+  )
+  IMAGE=formbricks/formbricks
+  ANON_TOKEN=$(
+    curl --silent https://ghcr.io/token\?scope\="repository:${IMAGE}:pull" \
+      | dasel --read=json --selector='token' \
+      | sd --fixed-strings '"' ''
+  )
+  CURRENT_TAG=$(
+    curl --silent --header="Authorization: Bearer ${ANON_TOKEN}" "https://ghcr.io/v2/${IMAGE}/tags/list?n=1000&last=${LAST_TAG}" \
+      | dasel --read=json --selector='tags.all()' \
+      | sd --fixed-strings '"' '' \
+      | (grep --perl-regexp '^\d+\.\d+\.\d+$' || :) \
+      | sort \
+      | tail --lines=1
+  )
+  if [[ -n $CURRENT_TAG && $LAST_TAG != "$CURRENT_TAG" ]] ; then
+    sd --fixed-strings "ghcr.io/${IMAGE}:${LAST_TAG}" "ghcr.io/${IMAGE}:${CURRENT_TAG}" Dockerfile
+    echo "Updated the \`Dockerfile\` from version ${LAST_TAG} to ${CURRENT_TAG}."
+  else
+    echo "No update available. The \`Dockerfile\` already points to the latest stable Formbricks release."
+  fi
+
+# Deploy new Formbricks release on fly.io
 deploy:
-  @flyctl deploy --ha=false --app digiges-forms
+  flyctl deploy --ha=false --app=digiges-forms
