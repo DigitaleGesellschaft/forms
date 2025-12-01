@@ -38,13 +38,11 @@ update:
   IMAGE=formbricks/formbricks
   ANON_TOKEN=$(
     curl --silent https://ghcr.io/token\?scope\="repository:${IMAGE}:pull" \
-      | dasel --read=json --selector='token' \
-      | sd --fixed-strings '"' ''
+      | dasel --read=json --write=plain --selector='token'
   )
   CURRENT_TAG=$(
     curl --silent --header="Authorization: Bearer ${ANON_TOKEN}" "https://ghcr.io/v2/${IMAGE}/tags/list?n=1000&last=${LAST_TAG}" \
-      | dasel --read=json --selector='tags.all()' \
-      | sd --fixed-strings '"' '' \
+      | dasel --read=json --write=plain --selector='tags.all()' \
       | (grep --perl-regexp '^\d+\.\d+\.\d+$' || :) \
       | sort \
       | tail --lines=1
