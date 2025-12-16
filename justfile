@@ -1,8 +1,8 @@
 set quiet
 
 [default]
-_list_cmds:
-  {{just_executable()}} --list
+_list-recipes:
+  {{quote(just_executable())}} --list --justfile={{quote(justfile())}}
 
 # Back up Formbricks' PostgreSQL DB
 backup:
