@@ -57,3 +57,12 @@ update:
 # Deploy new Formbricks release on fly.io
 deploy:
   flyctl deploy --ha=false --app=digiges-forms
+
+# Backup + Update + Deploy + Git-Commit-Push
+boomp: backup update deploy
+  #!/usr/bin/env bash
+  VERSION=$(
+    grep --perl-regexp --only-matching '^FROM\b.+?:v?\K\S+' Dockerfile \
+      | tail --lines=1
+  )
+  git add Dockerfile && git commit -m "chore: update Formbricks to v${VERSION}" && git push
