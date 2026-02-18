@@ -1,0 +1,4 @@
+# reference: https://github.com/wader/bump?tab=readme-ov-file#bumpfile
+formbricks /ghcr\.io\/formbricks\/formbricks:(\S+)/ docker:ghcr.io/formbricks/formbricks|*
+formbricks link "Release notes" https://github.com/formbricks/formbricks/releases
+Dockerfile

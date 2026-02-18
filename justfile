@@ -29,30 +29,7 @@ restore datetime=`find ./backups -maxdepth 1 -name 'formbricks.*.dump' -print0 |
 
 # Update Dockerfile to latest stable Formbricks release
 update:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  LAST_TAG=$(
-    grep --perl-regexp --only-matching '^FROM\b.+?:\K\S+' Dockerfile \
-      | tail --lines=1
-  )
-  IMAGE=formbricks/formbricks
-  ANON_TOKEN=$(
-    curl --silent https://ghcr.io/token\?scope\="repository:${IMAGE}:pull" \
-      | dasel --read=json --write=plain --selector='token'
-  )
-  CURRENT_TAG=$(
-    curl --silent --header="Authorization: Bearer ${ANON_TOKEN}" "https://ghcr.io/v2/${IMAGE}/tags/list?n=1000&last=${LAST_TAG}" \
-      | dasel --read=json --write=plain --selector='tags.all()' \
-      | (grep --perl-regexp '^\d+\.\d+\.\d+$' || :) \
-      | sort \
-      | tail --lines=1
-  )
-  if [[ -n $CURRENT_TAG && $LAST_TAG != "$CURRENT_TAG" ]] ; then
-    sd --fixed-strings "ghcr.io/${IMAGE}:${LAST_TAG}" "ghcr.io/${IMAGE}:${CURRENT_TAG}" Dockerfile
-    echo "Updated the \`Dockerfile\` from version ${LAST_TAG} to ${CURRENT_TAG}."
-  else
-    echo "No update available. The \`Dockerfile\` already points to the latest stable Formbricks release."
-  fi
+  bump update
 
 # Deploy new Formbricks release on fly.io
 deploy:
