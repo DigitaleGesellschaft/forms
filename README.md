@@ -91,8 +91,8 @@ To deploy a new `digiges-forms` release on Fly, follow these steps:
     Documentation of all the environment variables Formbricks supports for configuration should be found [in the
     docs](https://formbricks.com/docs/self-hosting/configuration/environment-variables). If something is missing, the following resources should help:
 
-    - [File `turbo.json`](https://github.com/formbricks/formbricks/blame/4.0.1/turbo.json#L113-L220) lists all supported env vars without further info. Use
-      [GitHub's compare
+    - Key `build.tasks.env` in file [`turbo.json`](https://github.com/formbricks/formbricks/blame/main/turbo.json) lists all supported env vars without further
+      info. Use [GitHub's compare
       view](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/viewing-and-comparing-commits/comparing-commits#comparing-tags) to
       compare the desired formbricks release tag with the one that is currently deployed. To e.g. show the diffs between version 4.0.0 and 4.0.1, use
       <https://github.com/formbricks/formbricks/compare/4.0.0...4.0.1#files_bucket>.
